@@ -1,4 +1,4 @@
-import Battleship.BattleshipGame;
+import Battleship.BattleshipGameRoom;
 import EmNet.Server;
 
 import java.util.ArrayList;
@@ -6,13 +6,12 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) {
         Server server = new Server(48863);
-        ArrayList<BattleshipGame> activeGames = new ArrayList<>();
+        ArrayList<BattleshipGameRoom> activeGames = new ArrayList<>();
+        ArrayList<BattleshipGameRoom> activeUsers = new ArrayList<>();
         server.start();
         while (true) {
             if (server.hasNewConnections()) {
-//                BattleshipGame newGame = new BattleshipGame(server.getNewConnection());
-//                activeGames.add(newGame);
-//                newGame.start();
+
             }
         }
     }
