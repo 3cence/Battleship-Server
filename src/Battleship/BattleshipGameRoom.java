@@ -1,19 +1,22 @@
 package Battleship;
 
+import EmNet.Packet;
 import Network.NetworkHandler;
 import Network.PacketData;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class BattleshipGameRoom extends Thread {
-    private ArrayList<User> players;
-    private ArrayList<User> spectators;
+    private List<User> players;
+    private List<User> spectators;
     private final String roomName, id;
     public BattleshipGameRoom(String roomName, int id) {
         this.roomName = roomName;
         this.id = String.valueOf(id);
-        players = new ArrayList<>();
-        spectators = new ArrayList<>();
+        players = Collections.synchronizedList(new ArrayList<>());
+        spectators = Collections.synchronizedList(new ArrayList<>());
     }
     public synchronized void joinRoom(User u) {
         String mode;
@@ -24,6 +27,13 @@ public class BattleshipGameRoom extends Thread {
             spectators.add(u);
             mode = "spectator";
         }
+        u.setMode(mode);
+        u.getConnection().onConnectionEnd(e->{
+            if (u.getMode().equals("player"))
+                players.remove(u);
+            if (u.getMode().equals("spectator"))
+                spectators.remove(u);
+        });
         ArrayList<PacketData> packet = new ArrayList<>();
         packet.add(new PacketData("joined_room", getRoomName()));
         packet.add(new PacketData("game_mode", mode));
@@ -39,17 +49,10 @@ public class BattleshipGameRoom extends Thread {
     }
     @Override
     public void run() {
-        int lastPlayer = 0;
-        int lastSpectator = 0;
-        while (true) {
-            if (players.size() > lastPlayer) {
-                System.out.println("New player Joined!");
-                lastPlayer++;
-            }
-            if (spectators.size() > lastSpectator) {
-                System.out.println("New spectator Joined!");
-                lastSpectator++;
-            }
-        }
+        // Wait for 2 players to be in the room
+        while (players.size() != 2) {}
+        System.out.println("Game started with user " + players.get(0).getName() + " and user " + players.get(1).getName());
+        // Get ship placements
+
     }
 }

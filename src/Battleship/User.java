@@ -4,23 +4,26 @@ import EmNet.Connection;
 
 public class User {
     private final Connection connection;
-    private BattleshipGameRoom gameRoom;
+    private String name;
+    private String mode;
     public User(Connection c) {
         connection = c;
+        name = "Guest";
+        mode = "";
     }
-    public BattleshipGameRoom getGameRoom() {
-        return gameRoom;
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getName() {
+        return name;
+    }
+    public String getMode() {
+        return mode;
+    }
+    public void setMode(String mode) {
+        this.mode = mode;
     }
     public Connection getConnection() {
         return connection;
-    }
-    public void joinGameRoom(BattleshipGameRoom gr) {
-        if (gameRoom == null) {
-            gameRoom = gr;
-            gr.joinRoom(this);
-        }
-        else {
-            throw new RuntimeException("Cannot add user. Already assigned to a room");
-        }
     }
 }

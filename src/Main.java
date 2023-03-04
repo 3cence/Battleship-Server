@@ -27,6 +27,7 @@ public class Main {
             if (server.hasNewConnections()) {
                 User newUser = new User(server.getNewConnection());
                 newUser.getConnection().sendPacket(buildActiveRooms(activeRooms));
+                newUser.getConnection().sendPacket(NetworkHandler.generatePacketData("name_request"));
                 newUsers.add(newUser);
                 System.out.println("New user joined");
             }
@@ -38,7 +39,10 @@ public class Main {
                         List<PacketData> pd = NetworkHandler.extractPacketData(c.getNextPacket());
                         System.out.println("User sent data: " + pd.get(0).type() + ":" + pd.get(0).data());
                         switch (pd.get(0).type()) {
-                            case "server_select":
+                            case "name":
+                                u.setName(pd.get(0).data());
+                                break;
+                            case "join_room":
                                 for (BattleshipGameRoom room: activeRooms) {
                                     if (room.getRoomId().equals(pd.get(0).data())) {
                                         room.joinRoom(u);
