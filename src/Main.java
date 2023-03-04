@@ -11,6 +11,7 @@ import java.util.List;
 public class Main {
     public static String buildActiveRooms(ArrayList<BattleshipGameRoom> rooms) {
         ArrayList<PacketData> packet = new ArrayList<>();
+        packet.add(new PacketData("room_list", "" + rooms.size()));
         for (BattleshipGameRoom room: rooms) {
             packet.add(new PacketData(room.getRoomId(), room.getRoomName()));
         }
@@ -18,6 +19,7 @@ public class Main {
     }
     public static void main(String[] args) {
         Server server = new Server(48863);
+        int roomIds = 0;
         ArrayList<BattleshipGameRoom> activeRooms = new ArrayList<>();
         ArrayList<User> newUsers = new ArrayList<>();
         server.start();
@@ -26,27 +28,37 @@ public class Main {
                 User newUser = new User(server.getNewConnection());
                 newUser.getConnection().sendPacket(buildActiveRooms(activeRooms));
                 newUsers.add(newUser);
+                System.out.println("New user joined");
             }
             if (!newUsers.isEmpty()) {
+                ArrayList<User> remove = new ArrayList<>();
                 for (User u: newUsers) {
                     Connection c = u.getConnection();
                     if (c.hasNextPacket()) {
                         List<PacketData> pd = NetworkHandler.extractPacketData(c.getNextPacket());
+                        System.out.println("User sent data: " + pd.get(0).type() + ":" + pd.get(0).data());
                         switch (pd.get(0).type()) {
                             case "server_select":
                                 for (BattleshipGameRoom room: activeRooms) {
                                     if (room.getRoomId().equals(pd.get(0).data())) {
                                         room.joinRoom(u);
-                                        newUsers.remove(u);
+                                        remove.add(u);
                                         break;
                                     }
                                 }
                                 break;
+                            case "make_room":
+                                activeRooms.add(new BattleshipGameRoom(pd.get(0).data(), roomIds));
+                                activeRooms.get(activeRooms.size() - 1).start();
+                                roomIds++;
                             case "refresh_rooms":
                                 c.sendPacket(buildActiveRooms(activeRooms));
                                 break;
                         }
                     }
+                }
+                while (remove.size() > 0) {
+                    newUsers.remove(remove.remove(0));
                 }
             }
         }
