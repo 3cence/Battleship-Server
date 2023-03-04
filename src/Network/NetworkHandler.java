@@ -30,6 +30,9 @@ public class NetworkHandler {
     public static String generatePacketData(String type, String data) {
         return "{" + type + ":" + data + "}";
     }
+    public static String generatePacketData(String type) {
+        return generatePacketData(type, "");
+    }
     public static String generatePacketData(PacketData[] list) {
         return generatePacketData(Arrays.stream(list).toList());
     }
