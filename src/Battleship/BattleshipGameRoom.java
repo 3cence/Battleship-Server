@@ -7,11 +7,12 @@ import EmNet.PacketType;
 import java.util.ArrayList;
 
 public class BattleshipGameRoom extends Thread {
-    private Connection clientConnection;
-    private volatile ArrayList<User> players;
+    private ArrayList<User> players;
     private ArrayList<User> spectators;
-    public BattleshipGameRoom(Connection c) {
-        clientConnection = c;
+    private final String roomName, id;
+    public BattleshipGameRoom(String roomName, int id) {
+        this.roomName = roomName;
+        this.id = String.valueOf(id);
         players = new ArrayList<>();
         spectators = new ArrayList<>();
     }
@@ -22,16 +23,14 @@ public class BattleshipGameRoom extends Thread {
             spectators.add(u);
         }
     }
+    public String getRoomName() {
+        return roomName;
+    }
+    public String getRoomId() {
+        return id;
+    }
     @Override
     public void run() {
-        // Await game start
-        while (true) {
-            if (clientConnection.hasNextPacket()) {
-                Packet p = clientConnection.getNextPacket();
-                if (p.getType() == PacketType.REQUEST && p.getData().equals("")) {
 
-                }
-            }
-        }
     }
 }

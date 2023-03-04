@@ -3,7 +3,7 @@ package Battleship;
 import EmNet.Connection;
 
 public class User {
-    private Connection connection;
+    private final Connection connection;
     private BattleshipGameRoom gameRoom;
     public User(Connection c) {
         connection = c;
@@ -11,8 +11,16 @@ public class User {
     public BattleshipGameRoom getGameRoom() {
         return gameRoom;
     }
+    public Connection getConnection() {
+        return connection;
+    }
     public void joinGameRoom(BattleshipGameRoom gr) {
-        gameRoom = gr;
-        gr.joinRoom(this);
+        if (gameRoom == null) {
+            gameRoom = gr;
+            gr.joinRoom(this);
+        }
+        else {
+            throw new RuntimeException("Cannot add user. Already assigned to a room");
+        }
     }
 }
