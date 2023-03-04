@@ -15,7 +15,7 @@ public class NetworkHandler {
         String[] stringPacketData = p.getData().split(",");
         for (String s: stringPacketData) {
             int split = s.indexOf(":");
-            packetData.add(new PacketData(s.substring(0, split), s.substring(split + 1)));
+            packetData.add(new PacketData(s.substring(1, split), s.substring(split + 1, s.length() - 1)));
         }
         return packetData;
     }
