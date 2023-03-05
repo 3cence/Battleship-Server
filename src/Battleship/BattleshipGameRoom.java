@@ -1,6 +1,5 @@
 package Battleship;
 
-import EmNet.Packet;
 import Network.NetworkHandler;
 import Network.PacketData;
 
@@ -9,8 +8,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class BattleshipGameRoom extends Thread {
-    private List<User> players;
-    private List<User> spectators;
+    private final List<User> players;
+    private final List<User> spectators;
     private final String roomName, id;
     public BattleshipGameRoom(String roomName, int id) {
         this.roomName = roomName;
@@ -62,18 +61,56 @@ public class BattleshipGameRoom extends Thread {
                 if (u.getConnection().hasNextPacket()) {
                     List<PacketData> p = NetworkHandler.extractPacketData(u.getConnection().getNextPacket());
                     if (p.get(0).type().equals("ship_placement")) {
-                        u.getBoard().placeShips(p);
-                        u.getConnection().sendPacket(NetworkHandler.generatePacketData
-                                ("waiting_on_players", "" + (players.size() - readyBoards)));
+                        if (u.getBoard().placeShips(p)) {
+                            readyBoards++;
+                            u.getConnection().sendPacket(NetworkHandler.generatePacketData
+                                    ("waiting_on_players", "" + (players.size() - readyBoards)));
+                            break;
+                        }
                     }
-                    else {
-                        u.getConnection().sendPacket(NetworkHandler.generatePacketData
-                                ("ignored","ship_placement"));
-                    }
+                    u.getConnection().sendPacket(NetworkHandler.generatePacketData
+                            ("ignored","ship_placement"));
                 }
             }
         }
         // Begin the game
-
+        // use "current" for current player and "1 - current" for not current
+        int current = 0;
+        player(current).getConnection().sendPacket(NetworkHandler.generatePacketData("your_turn"));
+        while (true) {
+            if (player(current).getConnection().hasNextPacket()) {
+                PacketData p = NetworkHandler.extractPacketData(player(current).getConnection().getNextPacket()).get(0);
+                switch (p.type()) {
+                    case "attack":
+                        try {
+                            int x = Integer.parseInt(p.data().split(",")[0]);
+                            int y = Integer.parseInt(p.data().split(",")[1]);
+                            boolean attackResult = player(1 - current).getBoard().attackTile(x, y);
+                            if (attackResult) {
+                                player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
+                                        ("attack_results","hit"));
+                                player(1 - current).getConnection().sendPacket(NetworkHandler.generatePacketData
+                                        ("opponent_attacked", x + "," + y + ",hit"));
+                            }
+                            else {
+                                player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
+                                        ("attack_results","miss"));
+                                player(1 - current).getConnection().sendPacket(NetworkHandler.generatePacketData
+                                        ("opponent_attacked", x + "," + y + ",miss"));
+                            }
+                            current = 1 - current;
+                            player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
+                                    ("your_turn"));
+                        } catch (RuntimeException e) {
+                            player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
+                                    ("invalid_attack"));
+                        }
+                        break;
+                    case "request_reload":
+                        // TODO: reload data
+                        break;
+                }
+            }
+        }
     }
 }

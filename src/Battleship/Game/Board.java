@@ -63,6 +63,15 @@ public class Board {
     }
 
     /**
+     * Does this board have floating ships?
+     * TODO: DOES NOT ACTUALLY CHECK
+     * @return t/f
+     */
+    public boolean hasShipsLeft() {
+        return true;
+    }
+
+    /**
      * Attacks given tile and returns if the attack is a hit?
      * @param x x
      * @param y y
