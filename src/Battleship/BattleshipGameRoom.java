@@ -47,12 +47,33 @@ public class BattleshipGameRoom extends Thread {
     public String getRoomId() {
         return id;
     }
+    private User player(int i) {
+        return players.get(i);
+    }
     @Override
     public void run() {
         // Wait for 2 players to be in the room
         while (players.size() != 2) {}
         System.out.println("Game started with user " + players.get(0).getName() + " and user " + players.get(1).getName());
-        // Get ship placements
+        // Get ship placements for both players
+        int readyBoards = 0;
+        while (readyBoards < players.size()) {
+            for (User u: players) {
+                if (u.getConnection().hasNextPacket()) {
+                    List<PacketData> p = NetworkHandler.extractPacketData(u.getConnection().getNextPacket());
+                    if (p.get(0).type().equals("ship_placement")) {
+                        u.getBoard().placeShips(p);
+                        u.getConnection().sendPacket(NetworkHandler.generatePacketData
+                                ("waiting_on_players", "" + (players.size() - readyBoards)));
+                    }
+                    else {
+                        u.getConnection().sendPacket(NetworkHandler.generatePacketData
+                                ("ignored","ship_placement"));
+                    }
+                }
+            }
+        }
+        // Begin the game
 
     }
 }

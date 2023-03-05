@@ -10,16 +10,19 @@ public class Board {
     private static final int ships = 5;
     private int shipsRemaining;
     private Tile[][] shipBoard;
+    private boolean areShipsPlaced;
 
     public Board() {
         shipsRemaining = 0;
+        areShipsPlaced = false;
     }
 
     /**
      * the entire ship_placement packet
      * @param shipPacket the entire ship_placement packet
+     * @return Were the ships successfully added?
      */
-    public void placeShips(List<PacketData> shipPacket) {
+    public boolean placeShips(List<PacketData> shipPacket) {
         PacketData headerPacket = shipPacket.remove(0);
         if (!headerPacket.type().equals("ship_placement") || !headerPacket.data().equals("" + ships))
             throw new RuntimeException("This is not a valid ship placement packet, has type " + headerPacket.type() + " & data " + headerPacket.data());
@@ -28,7 +31,7 @@ public class Board {
         for (PacketData ship: shipPacket) {
             ShipType type = ShipType.fromString(ship.type());
             if (usedTypes.contains(type))
-                throw new RuntimeException("Duplicate Ship types");
+                return false;
             usedTypes.add(type);
             // 0 = x, 1 = y, 2 = horizontal/vertical
             String[] positionInfo = ship.data().split(",");
@@ -44,9 +47,19 @@ public class Board {
                         shipBoard[y + i][x].makeShip(type);
                 }
                 else
-                    throw new RuntimeException("Invalid ship position");
+                    return false;
             }
         }
+        areShipsPlaced = true;
+        return true;
+    }
+
+    /**
+     * Returns weather all ships were successfully placed
+     * @return t/f
+     */
+    public boolean areShipsPlaced() {
+        return areShipsPlaced;
     }
 
     /**
