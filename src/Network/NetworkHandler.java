@@ -12,7 +12,7 @@ public class NetworkHandler {
         if (!p.getData().startsWith("{") || !p.getData().endsWith("}"))
             throw new RuntimeException("Invalid Packet Data");
         ArrayList<PacketData> packetData = new ArrayList<>();
-        String[] stringPacketData = p.getData().split(",");
+        String[] stringPacketData = p.getData().split(";");
         for (String s: stringPacketData) {
             int split = s.indexOf(":");
             packetData.add(new PacketData(s.substring(1, split), s.substring(split + 1, s.length() - 1)));
@@ -22,7 +22,7 @@ public class NetworkHandler {
     public static String generatePacketData(List<PacketData> list) {
         StringBuilder out = new StringBuilder();
         for (PacketData pd: list) {
-            out.append("{").append(pd.type()).append(":").append(pd.data()).append("},");
+            out.append("{").append(pd.type()).append(":").append(pd.data()).append("};");
         }
         out.deleteCharAt(out.length() - 1);
         return out.toString();
