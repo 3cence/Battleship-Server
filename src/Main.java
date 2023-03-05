@@ -13,7 +13,7 @@ public class Main {
         ArrayList<PacketData> packet = new ArrayList<>();
         packet.add(new PacketData("room_list", "" + rooms.size()));
         for (BattleshipGameRoom room: rooms) {
-            packet.add(new PacketData(room.getRoomName(), room.getRoomId() + room.getPlayerCount()));
+            packet.add(new PacketData(room.getRoomName(), room.getRoomId() + "," + room.getPlayerCount()));
         }
         return NetworkHandler.generatePacketData(packet);
     }
