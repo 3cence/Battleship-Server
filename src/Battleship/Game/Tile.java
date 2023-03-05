@@ -23,6 +23,8 @@ public class Tile {
         return state;
     }
     public void makeShip(ShipType shipType) {
+        if (isShip())
+            throw new RuntimeException("Already a ship!");
         ship = shipType;
     }
     public boolean isShip() {
