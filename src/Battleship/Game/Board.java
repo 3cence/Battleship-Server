@@ -63,12 +63,12 @@ public class Board {
     }
 
     /**
-     * Does this board have floating ships?
+     * How many ships are still floating?
      * TODO: DOES NOT ACTUALLY CHECK
-     * @return t/f
+     * @return # of ships
      */
-    public boolean hasShipsLeft() {
-        return true;
+    public int shipsLeft() {
+        return 5;
     }
 
     /**

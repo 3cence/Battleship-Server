@@ -77,7 +77,7 @@ public class BattleshipGameRoom extends Thread {
         // use "current" for current player and "1 - current" for not current
         int current = 0;
         player(current).getConnection().sendPacket(NetworkHandler.generatePacketData("your_turn"));
-        while (true) {
+        while (player(0).getBoard().shipsLeft() > 0 && player(1).getBoard().shipsLeft() > 0) {
             if (player(current).getConnection().hasNextPacket()) {
                 PacketData p = NetworkHandler.extractPacketData(player(current).getConnection().getNextPacket()).get(0);
                 switch (p.type()) {
@@ -111,6 +111,31 @@ public class BattleshipGameRoom extends Thread {
                         break;
                 }
             }
+        }
+        // End the game
+        if (player(0).getBoard().shipsLeft() == 0) {
+            player(0).getConnection().sendPacket(NetworkHandler.generatePacketData
+                    ("game_over","lose"));
+            player(1).getConnection().sendPacket(NetworkHandler.generatePacketData
+                    ("game_over","win"));
+        }
+        else if (player(1).getBoard().shipsLeft() == 0) {
+            player(1).getConnection().sendPacket(NetworkHandler.generatePacketData
+                    ("game_over", "lose"));
+            player(0).getConnection().sendPacket(NetworkHandler.generatePacketData
+                    ("game_over", "win"));
+        }
+        else {
+            player(1).getConnection().sendPacket(NetworkHandler.generatePacketData
+                    ("game_over", "abort"));
+            player(0).getConnection().sendPacket(NetworkHandler.generatePacketData
+                    ("game_over", "abort"));
+        }
+        try {
+            sleep(30000);
+            // TODO: End connections and remove this room from active rooms
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }
