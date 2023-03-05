@@ -88,15 +88,15 @@ public class BattleshipGameRoom extends Thread {
                             boolean attackResult = player(1 - current).getBoard().attackTile(x, y);
                             if (attackResult) {
                                 player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
-                                        ("attack_results","hit"));
+                                        ("attack_results","hit," + player(1 - current).getBoard().shipsLeft()));
                                 player(1 - current).getConnection().sendPacket(NetworkHandler.generatePacketData
-                                        ("opponent_attacked", x + "," + y + ",hit"));
+                                        ("opponent_attacked", x + "," + y + ",hit," + player(1 - current).getBoard().shipsLeft()));
                             }
                             else {
                                 player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
-                                        ("attack_results","miss"));
+                                        ("attack_results","miss," + player(1 - current).getBoard().shipsLeft()));
                                 player(1 - current).getConnection().sendPacket(NetworkHandler.generatePacketData
-                                        ("opponent_attacked", x + "," + y + ",miss"));
+                                        ("opponent_attacked", x + "," + y + ",miss," + player(1 - current).getBoard().shipsLeft()));
                             }
                             current = 1 - current;
                             player(current).getConnection().sendPacket(NetworkHandler.generatePacketData

@@ -64,13 +64,25 @@ public class Board {
 
     /**
      * How many ships are still floating?
-     * TODO: DOES NOT ACTUALLY CHECK
      * @return # of ships
      */
     public int shipsLeft() {
-        return 5;
+        return shipsRemaining;
     }
 
+    /**
+     * is ship sunk?
+     * @param x x
+     * @param y y
+     * @return t/f
+     */
+    private boolean isShipSunk(int x, int y) {
+        if (!shipBoard[y][x].isShip())
+            return true;
+        if (shipBoard[y][x].getState() != Tile.HIT)
+            return false;
+        return isShipSunk(x + 1, y) && isShipSunk(x - 1, y) && isShipSunk(x, y + 1) && isShipSunk(x, y - 1);
+    }
     /**
      * Attacks given tile and returns if the attack is a hit?
      * @param x x
@@ -81,6 +93,8 @@ public class Board {
         Tile target = shipBoard[y][x];
         switch (target.hit()) {
             case Tile.HIT:
+                if (isShipSunk(x, y))
+                    shipsRemaining--;
                 return true;
             case Tile.MISS:
                 return false;
