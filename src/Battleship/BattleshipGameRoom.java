@@ -46,6 +46,9 @@ public class BattleshipGameRoom extends Thread {
     public String getRoomId() {
         return id;
     }
+    public int getPlayerCount() {
+        return players.size();
+    }
     private User player(int i) {
         return players.get(i);
     }

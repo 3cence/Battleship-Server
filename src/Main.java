@@ -13,7 +13,7 @@ public class Main {
         ArrayList<PacketData> packet = new ArrayList<>();
         packet.add(new PacketData("room_list", "" + rooms.size()));
         for (BattleshipGameRoom room: rooms) {
-            packet.add(new PacketData(room.getRoomId(), room.getRoomName()));
+            packet.add(new PacketData(room.getRoomName(), room.getRoomId() + room.getPlayerCount()));
         }
         return NetworkHandler.generatePacketData(packet);
     }
@@ -26,8 +26,8 @@ public class Main {
         while (true) {
             if (server.hasNewConnections()) {
                 User newUser = new User(server.getNewConnection());
-                newUser.getConnection().sendPacket(buildActiveRooms(activeRooms));
                 newUser.getConnection().sendPacket(NetworkHandler.generatePacketData("name_request"));
+                newUser.getConnection().sendPacket(buildActiveRooms(activeRooms));
                 newUsers.add(newUser);
                 System.out.println("New user joined");
             }
