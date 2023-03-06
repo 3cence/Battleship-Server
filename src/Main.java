@@ -24,6 +24,11 @@ public class Main {
         ArrayList<User> newUsers = new ArrayList<>();
         server.start();
         while (true) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             if (server.hasNewConnections()) {
                 User newUser = new User(server.getNewConnection());
                 newUser.getConnection().sendPacket(NetworkHandler.generatePacketData("name_request"));
@@ -35,6 +40,10 @@ public class Main {
                 ArrayList<User> remove = new ArrayList<>();
                 for (User u: newUsers) {
                     Connection c = u.getConnection();
+                    if (c.getConnectionStatus() == -1) {
+                        System.out.println("User Disconnected");
+                        remove.add(u);
+                    }
                     if (c.hasNextPacket()) {
                         List<PacketData> pd = NetworkHandler.extractPacketData(c.getNextPacket());
                         System.out.println("User sent data: " + pd.get(0).type() + ":" + pd.get(0).data());

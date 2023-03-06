@@ -55,7 +55,14 @@ public class BattleshipGameRoom extends Thread {
     @Override
     public void run() {
         // Wait for 2 players to be in the room
-        while (players.size() != 2) {}
+        while (players.size() != 2) {
+            try {
+                sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            // TODO: add room timeout
+        }
         System.out.println("Game started with user " + players.get(0).getName() + " and user " + players.get(1).getName());
         // Get ship placements for both players
         int readyBoards = 0;
