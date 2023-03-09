@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="BasicNetwork">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../BasicNetwork/out/production/BasicNetwork" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../BasicNetwork/src" />
+    </SOURCES>
+  </library>
+</component>
