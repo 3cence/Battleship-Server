@@ -1,3 +1,5 @@
+package Battleship;
+
 import Battleship.BattleshipGameRoom;
 import Battleship.User;
 import EmNet.Connection;
@@ -6,10 +8,13 @@ import Network.NetworkHandler;
 import Network.PacketData;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Main {
-    public static String buildActiveRooms(ArrayList<BattleshipGameRoom> rooms) {
+    private static List<BattleshipGameRoom> activeRooms;
+    private static List<User> newUsers;
+    public static String buildActiveRooms(List<BattleshipGameRoom> rooms) {
         ArrayList<PacketData> packet = new ArrayList<>();
         packet.add(new PacketData("room_list", "" + rooms.size()));
         for (BattleshipGameRoom room: rooms) {
@@ -17,11 +22,17 @@ public class Main {
         }
         return NetworkHandler.generatePacketData(packet);
     }
+    public static List<BattleshipGameRoom> getActiveRoomList() {
+        return activeRooms;
+    }
+    public static List<User> getUserList() {
+        return newUsers;
+    }
     public static void main(String[] args) {
         Server server = new Server(48863);
         int roomIds = 0;
-        ArrayList<BattleshipGameRoom> activeRooms = new ArrayList<>();
-        ArrayList<User> newUsers = new ArrayList<>();
+        activeRooms = Collections.synchronizedList(new ArrayList<>());
+        newUsers = Collections.synchronizedList(new ArrayList<>());
         server.start();
         while (true) {
             try {

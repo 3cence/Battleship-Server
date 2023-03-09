@@ -154,11 +154,10 @@ public class BattleshipGameRoom extends Thread {
             player(0).getConnection().sendPacket(NetworkHandler.generatePacketData
                     ("game_over", "abort"));
         }
-        try {
-            sleep(30000);
-            // TODO: End connections and remove this room from active rooms
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        for (User u: players)
+            Main.getUserList().add(u);
+        for (User u: spectators)
+            Main.getUserList().add(u);
+        Main.getActiveRoomList().remove(this);
     }
 }
