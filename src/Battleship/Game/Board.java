@@ -94,9 +94,9 @@ public class Board {
         while (true) {
             if (shipBoard[ty][tx].getState() != Tile.HIT)
                 return false;
-            if (ty + 1 < 10 && shipBoard[ty + 1][tx].isShip() && shipBoard[ty + 1][tx].getShip() == type)
+            if (ty + 1 < 10 && shipBoard[ty + 1][tx].isShip() && shipBoard[ty + 1][tx].getShip().type().equals(type.type()))
                 ty++;
-            else if (tx + 1 < 10 && shipBoard[ty][tx + 1].isShip() && shipBoard[ty][tx + 1].getShip() == type)
+            else if (tx + 1 < 10 && shipBoard[ty][tx + 1].isShip() && shipBoard[ty][tx + 1].getShip().type().equals(type.type()))
                 tx++;
             else
                 break;
@@ -104,9 +104,9 @@ public class Board {
         while (true) {
             if (shipBoard[ty][tx].getState() != Tile.HIT)
                 return false;
-            if (ty - 1 > 0 && shipBoard[ty - 1][tx].isShip() && shipBoard[ty - 1][tx].getShip() == type)
+            if (ty - 1 >= 0 && shipBoard[ty - 1][tx].isShip() && shipBoard[ty - 1][tx].getShip().type().equals(type.type()))
                 ty--;
-            else if (tx - 1 > 0 && shipBoard[ty][tx - 1].isShip() && shipBoard[ty][tx - 1].getShip() == type)
+            else if (tx - 1 >= 0 && shipBoard[ty][tx - 1].isShip() && shipBoard[ty][tx - 1].getShip().type().equals(type.type()))
                 tx--;
             else
                 break;
