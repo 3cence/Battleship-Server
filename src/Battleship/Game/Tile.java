@@ -30,4 +30,7 @@ public class Tile {
     public boolean isShip() {
         return ship != null;
     }
+    public ShipType getShip() {
+        return ship;
+    }
 }

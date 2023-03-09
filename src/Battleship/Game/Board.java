@@ -34,9 +34,14 @@ public class Board {
         PacketData headerPacket = shipPacket.remove(0);
         if (!headerPacket.type().equals("ship_placement") || !headerPacket.data().equals("" + ships))
             throw new RuntimeException("This is not a valid ship placement packet, has type " + headerPacket.type() + " & data " + headerPacket.data());
+//        for (PacketData p: shipPacket) {
+//            System.out.print(p.type() + ":" + p.data() + "    ");
+//        }
+        System.out.println();
         shipBoard = makeNewBoard();
         ArrayList<ShipType> usedTypes = new ArrayList<>();
         for (PacketData ship: shipPacket) {
+            shipsRemaining++;
             ShipType type = ShipType.fromString(ship.type());
             if (usedTypes.contains(type))
                 return false;
@@ -47,8 +52,7 @@ public class Board {
             int y = Integer.parseInt(positionInfo[1]);
             boolean isHorizontal = positionInfo[2].equals("false");
             for (int i = 0; i < type.holes(); i++) {
-                shipsRemaining++;
-                if (x+i < size && y+i < size) {
+                if ((x+i < size && isHorizontal) || (!isHorizontal && y+i < size)) {
                     if (isHorizontal)
                         shipBoard[y][x + i].makeShip(type);
                     else
@@ -85,11 +89,29 @@ public class Board {
      * @return t/f
      */
     private boolean isShipSunk(int x, int y) {
-        if (!shipBoard[y][x].isShip())
-            return true;
-        if (shipBoard[y][x].getState() != Tile.HIT)
-            return false;
-        return isShipSunk(x + 1, y) && isShipSunk(x - 1, y) && isShipSunk(x, y + 1) && isShipSunk(x, y - 1);
+        ShipType type = shipBoard[y][x].getShip();
+        int tx = x, ty = y;
+        while (true) {
+            if (shipBoard[ty][tx].getState() != Tile.HIT)
+                return false;
+            if (ty + 1 < 10 && shipBoard[ty + 1][tx].isShip() && shipBoard[ty + 1][tx].getShip() == type)
+                ty++;
+            else if (tx + 1 < 10 && shipBoard[ty][tx + 1].isShip() && shipBoard[ty][tx + 1].getShip() == type)
+                tx++;
+            else
+                break;
+        }
+        while (true) {
+            if (shipBoard[ty][tx].getState() != Tile.HIT)
+                return false;
+            if (ty - 1 > 0 && shipBoard[ty - 1][tx].isShip() && shipBoard[ty - 1][tx].getShip() == type)
+                ty--;
+            else if (tx - 1 > 0 && shipBoard[ty][tx - 1].isShip() && shipBoard[ty][tx - 1].getShip() == type)
+                tx--;
+            else
+                break;
+        }
+        return true;
     }
     /**
      * Attacks given tile and returns if the attack is a hit?

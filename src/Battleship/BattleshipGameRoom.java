@@ -67,25 +67,32 @@ public class BattleshipGameRoom extends Thread {
         //TODO: send game_start packet to both clients
         // Get ship placements for both players
         int readyBoards = 0;
-        while (readyBoards < players.size()) {
+        while (readyBoards < 2) {
             for (User u: players) {
                 if (u.getConnection().hasNextPacket()) {
                     List<PacketData> p = NetworkHandler.extractPacketData(u.getConnection().getNextPacket());
                     if (p.get(0).type().equals("ship_placement")) {
+                        System.out.println("placing ships for " + u.getName());
                         if (u.getBoard().placeShips(p)) {
                             readyBoards++;
                             u.getConnection().sendPacket(NetworkHandler.generatePacketData
                                     ("waiting_on_players", "" + (players.size() - readyBoards)));
                             break;
                         }
+                        else
+                            System.out.println("PLaCEMENT GON WRONG");
                     }
-                    u.getConnection().sendPacket(NetworkHandler.generatePacketData
+                    else
+                        u.getConnection().sendPacket(NetworkHandler.generatePacketData
                             ("ignored","ship_placement"));
                 }
             }
         }
+        System.out.println("GAME START!");
         // Begin the game
         // use "current" for current player and "1 - current" for not current
+        player(0).getConnection().sendPacket(NetworkHandler.generatePacketData("game_start", player(1).getName()));
+        player(1).getConnection().sendPacket(NetworkHandler.generatePacketData("game_start", player(0).getName()));
         int current = 0;
         player(current).getConnection().sendPacket(NetworkHandler.generatePacketData("your_turn"));
         while (player(0).getBoard().shipsLeft() > 0 && player(1).getBoard().shipsLeft() > 0) {
@@ -96,16 +103,19 @@ public class BattleshipGameRoom extends Thread {
                         try {
                             int x = Integer.parseInt(p.data().split(",")[0]);
                             int y = Integer.parseInt(p.data().split(",")[1]);
+                            System.out.println(x + ", " + y);
                             boolean attackResult = player(1 - current).getBoard().attackTile(x, y);
                             if (attackResult) {
+                                System.out.println("Hit!");
                                 player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
-                                        ("attack_results",x + "," + y + "hit," + player(1 - current).getBoard().shipsLeft()));
+                                        ("attack_results",x + "," + y + ",hit," + player(1 - current).getBoard().shipsLeft()));
                                 player(1 - current).getConnection().sendPacket(NetworkHandler.generatePacketData
                                         ("opponent_attacked", x + "," + y + ",hit," + player(1 - current).getBoard().shipsLeft()));
                             }
                             else {
+                                System.out.println("Miss!");
                                 player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
-                                        ("attack_results",x + "," + y + "miss," + player(1 - current).getBoard().shipsLeft()));
+                                        ("attack_results",x + "," + y + ",miss," + player(1 - current).getBoard().shipsLeft()));
                                 player(1 - current).getConnection().sendPacket(NetworkHandler.generatePacketData
                                         ("opponent_attacked", x + "," + y + ",miss," + player(1 - current).getBoard().shipsLeft()));
                             }
@@ -113,6 +123,7 @@ public class BattleshipGameRoom extends Thread {
                             player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
                                     ("your_turn"));
                         } catch (RuntimeException e) {
+                            System.out.println(e.getMessage());
                             player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
                                     ("invalid_attack"));
                         }
