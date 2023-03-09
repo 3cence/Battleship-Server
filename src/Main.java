@@ -62,6 +62,7 @@ public class Main {
                                 break;
                             case "make_room":
                                 activeRooms.add(new BattleshipGameRoom(pd.get(0).data(), roomIds));
+                                // TODO: make spectators optional
                                 activeRooms.get(activeRooms.size() - 1).start();
                                 roomIds++;
                             case "refresh_rooms":

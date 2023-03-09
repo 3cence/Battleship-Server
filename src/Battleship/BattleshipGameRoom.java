@@ -64,6 +64,7 @@ public class BattleshipGameRoom extends Thread {
             // TODO: add room timeout
         }
         System.out.println("Game started with user " + players.get(0).getName() + " and user " + players.get(1).getName());
+        //TODO: send game_start packet to both clients
         // Get ship placements for both players
         int readyBoards = 0;
         while (readyBoards < players.size()) {
@@ -98,13 +99,13 @@ public class BattleshipGameRoom extends Thread {
                             boolean attackResult = player(1 - current).getBoard().attackTile(x, y);
                             if (attackResult) {
                                 player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
-                                        ("attack_results","hit," + player(1 - current).getBoard().shipsLeft()));
+                                        ("attack_results",x + "," + y + "hit," + player(1 - current).getBoard().shipsLeft()));
                                 player(1 - current).getConnection().sendPacket(NetworkHandler.generatePacketData
                                         ("opponent_attacked", x + "," + y + ",hit," + player(1 - current).getBoard().shipsLeft()));
                             }
                             else {
                                 player(current).getConnection().sendPacket(NetworkHandler.generatePacketData
-                                        ("attack_results","miss," + player(1 - current).getBoard().shipsLeft()));
+                                        ("attack_results",x + "," + y + "miss," + player(1 - current).getBoard().shipsLeft()));
                                 player(1 - current).getConnection().sendPacket(NetworkHandler.generatePacketData
                                         ("opponent_attacked", x + "," + y + ",miss," + player(1 - current).getBoard().shipsLeft()));
                             }
@@ -123,6 +124,7 @@ public class BattleshipGameRoom extends Thread {
             }
         }
         // End the game
+        // TODO: send opponent's board
         if (player(0).getBoard().shipsLeft() == 0) {
             player(0).getConnection().sendPacket(NetworkHandler.generatePacketData
                     ("game_over","lose"));

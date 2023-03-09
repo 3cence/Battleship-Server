@@ -16,7 +16,15 @@ public class Board {
         shipsRemaining = 0;
         areShipsPlaced = false;
     }
-
+    private Tile[][] makeNewBoard() {
+        Tile[][] t = new Tile[10][10];
+        for (int i = 0; i < t.length; i++) {
+            for (int j = 0; j < t[i].length; j++) {
+                t[i][j] = new Tile();
+            }
+        }
+        return t;
+    }
     /**
      * the entire ship_placement packet
      * @param shipPacket the entire ship_placement packet
@@ -26,7 +34,7 @@ public class Board {
         PacketData headerPacket = shipPacket.remove(0);
         if (!headerPacket.type().equals("ship_placement") || !headerPacket.data().equals("" + ships))
             throw new RuntimeException("This is not a valid ship placement packet, has type " + headerPacket.type() + " & data " + headerPacket.data());
-        shipBoard = new Tile[10][10];
+        shipBoard = makeNewBoard();
         ArrayList<ShipType> usedTypes = new ArrayList<>();
         for (PacketData ship: shipPacket) {
             ShipType type = ShipType.fromString(ship.type());
@@ -35,9 +43,9 @@ public class Board {
             usedTypes.add(type);
             // 0 = x, 1 = y, 2 = horizontal/vertical
             String[] positionInfo = ship.data().split(",");
-            int x = Integer.parseInt(positionInfo[0].substring(1));
-            int y = Integer.parseInt(positionInfo[1].substring(1));
-            boolean isHorizontal = positionInfo[2].equals("horizontal");
+            int x = Integer.parseInt(positionInfo[0]);
+            int y = Integer.parseInt(positionInfo[1]);
+            boolean isHorizontal = positionInfo[2].equals("false");
             for (int i = 0; i < type.holes(); i++) {
                 shipsRemaining++;
                 if (x+i < size && y+i < size) {
