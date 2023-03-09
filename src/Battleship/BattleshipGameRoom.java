@@ -71,7 +71,7 @@ public class BattleshipGameRoom extends Thread {
             for (User u: players) {
                 if (u.getConnection().hasNextPacket()) {
                     List<PacketData> p = NetworkHandler.extractPacketData(u.getConnection().getNextPacket());
-                    if (p.get(0).type().equals("ship_placement")) {
+                    if (p.get(0).type().equals("ship_placement") && !u.getBoard().areShipsPlaced()) {
                         System.out.println("placing ships for " + u.getName());
                         if (u.getBoard().placeShips(p)) {
                             readyBoards++;
